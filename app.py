@@ -6,6 +6,7 @@ Menjalankan Web Dashboard pada Port 3000
 
 import datetime
 import os
+import secrets
 import sqlite3
 import uuid
 
@@ -20,6 +21,7 @@ DEBUG = os.environ.get("APP_DEBUG", "False").lower() in ("true", "1", "yes")
 DB_FILE = os.environ.get("DB_FILE", "database.db")
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 
 
 @app.route("/assets/<path:filename>")
