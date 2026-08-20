@@ -1,0 +1,67 @@
+## REVIEW DASHBOARD SIMANIK
+### **A. COLOR & DESIGN**
+#### Yang Sudah Baik:
+- Design system terstruktur dengan CSS variables (`style.css:7-162`)
+- Primary color Burgundy `#8E1B2F` memberikan identitas unik
+- Color hierarchy jelas: primary, semantic (green/amber/rose), neutrals
+- Gradient accents pada stat cards dan hero section
+#### Perlu Improvement:
+Issue	Lokasi	Saran
+Duplikasi CSS stat-card	style.css:314-388 & style.css:430-509	Hapus salah satu definisi
+Kontras text secondary	--text-secondary: #6b7280	Terlalu terang di background putih, gunakan #4b5563
+Warna badge rose	badge--rose menggunakan --rose-*	Konsisten dengan primary burgundy untuk "danger"
+Dark mode belum ada	Seluruh CSS	Tambahkan @media (prefers-color-scheme: dark)
+Loading state	Tidak ada skeleton	Tambahkan skeleton loader saat fetch data
+### **B. FUNGSIONALITAS**
+#### Yang Sudah Baik:
+- CRUD lengkap (vehicles, maintenance, tax, trips)
+- Export PDF/Excel dengan jsPDF & XLSX
+- Keyboard shortcuts (`Ctrl+N`, `?`, `1-5`)
+- Tax calendar visualization
+- Alert banner untuk urgent items
+- Vehicle detail modal dengan riwayat lengkap
+#### Perlu Improvement:
+Priority	Issue	Saran
+HIGH	Tidak ada validasi form (tahun < 1900, odometer negatif)	Tambahkan min/max attributes + JS validation
+HIGH	Tidak ada pagination di tabel	Tambahkan pagination untuk >50 records
+HIGH	Tidak ada search debounce	Tambahkan debounce 300ms pada search inputs
+MEDIUM	Tidak ada sorting di tabel	Tambahkan clickable column headers
+MEDIUM	Tidak ada filter date range di history	Tambahkan date range picker
+MEDIUM	Tidak ada bulk actions (delete multiple)	Tambahkan checkbox selection
+MEDIUM	Tidak ada export Inventaris	Tambahkan export untuk vehicle list
+LOW	Tidak ada notification bell	Tambahkan notifikasi untuk pajak即将 jatuh tempo
+LOW	Tidak ada print-friendly view	Tambahkan @media print styles
+LOW	Tidak ada data backup/restore	Tambahkan export/import JSON
+### **C. CODE QUALITY**
+Issue	Lokasi	Saran
+Magic number 3000000 untuk STNK	app.js:434, 588	Extract ke constant STNK_COST = 3000000
+Inline styles berlebihan	app.js render functions	Pindahkan ke CSS classes
+Tidak ada error handling di API	app.js fetch calls	Tambahkan try-catch + user feedback
+Tidak ada loading indicator	fetchAll()	Tambahkan spinner saat loading
+Hardcoded fallback image	app.js:266	Gunakan placeholder SVG atau default image
+### **D. UX RECOMMENDATIONS**
+1. **Tambahkan breadcrumb** - Untuk navigasi yang lebih jelas
+2. **Tambahkan "Last Updated" timestamp** - Kapan data terakhir di-refresh
+3. **Tambahkan auto-refresh toggle** - Untuk real-time monitoring
+4. **Tambahkan confirmation dialog** - Sebelum leave page dengan unsaved changes
+5. **Tambahkan empty state illustration** - Bukan hanya teks
+6. **Tambahkan progress indicator** - Untuk odometer menuju servis berikutnya
+### **E. QUICK WINS**
+/* Tambahkan di style.css untuk dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #f1f5f9;
+    --border: #334155;
+  }
+}
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, var(--slate-200) 25%, var(--slate-100) 50%, var(--slate-200) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+**Overall Score: 7.5/10** - Dashboard sudah cukup lengkap secara fitur, perlu improvement di validasi, pagination, dan dark mode.

@@ -1,0 +1,49 @@
+<!-- ============================================================ -->
+<!-- TAB 2: INVENTARIS -->
+<!-- ============================================================ -->
+<section id="sec-inventory" class="section">
+  <div class="stack--6">
+    <div class="card card--inventory-directory slide-up">
+      <div class="flex-between flex-wrap mb-16" style="gap:12px">
+        <div>
+          <h2 class="text-bold" style="font-size:20px">Direktori Inventaris Kendaraan</h2>
+          <p class="text-xs text-secondary" style="margin-top:2px">Daftar seluruh unit kendaraan terdaftar beserta status pajak, jadwal perawatan, dan posisi pool</p>
+        </div>
+        <div class="flex-gap">
+          <div class="view-toggle">
+            <button id="view-grid-btn" onclick="setView('grid')" class="view-toggle__btn active"><i class="fa-solid fa-grid-2"></i> Grid</button>
+            <button id="view-table-btn" onclick="setView('table')" class="view-toggle__btn"><i class="fa-solid fa-table-list"></i> Tabel</button>
+          </div>
+          <button onclick="openModal('addVehicleModal')" class="btn btn--primary"><i class="fa-solid fa-plus"></i> + Kendaraan Masuk</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <div class="search"><i class="fa-solid fa-search"></i><input id="inv-search" oninput="renderInventory()" type="text" placeholder="Cari Plat Nomor, Merk, Model..." class="input"></div>
+        <select id="inv-category" onchange="renderInventory()" class="select">
+          <option value="">Semua Kategori</option>
+          <option value="Mobil MPV/SUV">Mobil MPV/SUV</option>
+          <option value="Truk/Bus">Truk/Bus</option>
+          <option value="Sepeda Motor">Sepeda Motor</option>
+          <option value="Kendaraan Niaga/Pick-up">Kendaraan Niaga/Pick-up</option>
+          <option value="Sedan/Hatchback">Sedan/Hatchback</option>
+        </select>
+        <select id="inv-status" onchange="renderInventory()" class="select">
+          <option value="">Semua Status Operasional</option>
+          <option value="Tersedia">Tersedia</option>
+          <option value="Sedang Digunakan">Sedang Digunakan</option>
+          <option value="Dalam Perawatan">Dalam Perawatan</option>
+        </select>
+        <select id="inv-pool" onchange="renderInventory()" class="select">
+          <option value="">Semua Pool / Garasi</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="text-xs text-secondary">
+      Menampilkan <strong id="inv-showing" style="color:var(--text)">0</strong> dari <strong id="inv-total" style="color:var(--text)">0</strong> kendaraan
+    </div>
+
+    <div id="inventory-grid" class="grid grid--3"></div>
+    <div id="inventory-table" style="display:none;"></div>
+  </div>
+</section>

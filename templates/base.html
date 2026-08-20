@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMANIK — Sistem Manajemen Inventaris Kendaraan</title>
+  <meta name="description"
+    content="SIMANIK - Sistem Manajemen Inventaris, Pajak, Perawatan & Operasional Kendaraan Real-time">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner">
+      <img src="/assets/dsi-spin.gif" alt="Loading...">
+    </div>
+    <div class="loading-text">Memuat Data...</div>
+    <div class="loading-subtext">Menghubungkan ke server SIMANIK</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- HEADER -->
+  <!-- ============================================================ -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon"><img src="/assets/dsi.png" alt="DSI Logo"></div>
+        <div class="logo-text">
+          <div class="logo-title">SIMANIK <span class="logo-badge">Inventaris Real-time</span></div>
+          <p class="logo-sub">Sistem Manajemen Inventaris, Pajak, Perawatan &amp; Operasional Kendaraan</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button onclick="toggleTheme()" class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
+          <i class="fa-solid fa-moon"></i>
+          <i class="fa-solid fa-sun"></i>
+        </button>
+        <button onclick="toggleShortcutHelp()" class="shortcut-hint" title="Keyboard Shortcuts"><i
+            class="fa-solid fa-question"></i></button>
+        <!-- <button onclick="resetDemo()" class="btn btn--ghost" title="Reset data ke standar awal"><i
+            class="fa-solid fa-rotate"></i> Reset Demo</button> -->
+        <button onclick="openModal('addVehicleModal')" class="btn btn--primary" title="Ctrl+N"><i
+            class="fa-solid fa-plus"></i> Kendaraan Masuk</button>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-tab active" title="Tekan 1"><i
+          class="fa-solid fa-chart-pie"></i> Dashboard</button>
+      <button onclick="switchTab('inventory')" id="tab-inventory" class="nav-tab" title="Tekan 2"><i
+          class="fa-solid fa-car-side"></i> Inventaris Kendaraan <span class="nav-badge nav-badge--neutral"
+          id="nav-count-vehicles">0</span></button>
+      <button onclick="switchTab('maintenance')" id="tab-maintenance" class="nav-tab" title="Tekan 3"><i
+          class="fa-solid fa-wrench"></i> Status Perawatan <span class="nav-badge nav-badge--amber"
+          id="nav-count-maint">0</span></button>
+      <button onclick="switchTab('tax')" id="tab-tax" class="nav-tab" title="Tekan 4"><i
+          class="fa-solid fa-file-invoice-dollar"></i> Status Pajak &amp; STNK <span class="nav-badge nav-badge--teal"
+          id="nav-count-tax">0</span></button>
+      <button onclick="switchTab('tracking')" id="tab-tracking" class="nav-tab" title="Tekan 5"><i
+          class="fa-solid fa-route"></i> Riwayat &amp; Live Tracking <span class="nav-badge nav-badge--green"
+          id="nav-count-trips">0 Jalan</span></button>
+    </nav>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- MAIN -->
+  <!-- ============================================================ -->
+  <main class="main">
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+      <i id="toast-icon" class="fa-solid fa-circle-check toast__icon"></i>
+      <span id="toast-text" class="toast__text"></span>
+      <button onclick="hideToast()" class="toast__close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    {% block content %}{% endblock %}
+
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- FOOTER -->
+  <!-- ============================================================ -->
+  <footer class="footer">
+    <p>SIMANIK &copy; TES-2026 — Sistem Manajemen Inventaris Kendaraan</p>
+  </footer>
+
+  <!-- ============================================================ -->
+  <!-- MODALS -->
+  <!-- ============================================================ -->
+
+  <!-- Modal: Add Vehicle -->
+  <div class="modal-overlay" id="addVehicleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-car-side" style="color:var(--blue-600)"></i> Pencatatan Kendaraan
+          Masuk Inventaris</h3>
+        <button onclick="closeModal('addVehicleModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitAddVehicle(event)">
+        <div class="modal-body">
+          <div class="form-grid--3">
+            <div class="field"><label class="label">Plat Nomor *</label><input id="av_plate" required
+                placeholder="B 1234 ABC" style="text-transform:uppercase;font-family:monospace;font-weight:700"
+                class="input"></div>
+            <div class="field"><label class="label">Merk *</label><input id="av_brand" required placeholder="Toyota"
+                class="input"></div>
+            <div class="field"><label class="label">Model *</label><input id="av_model" required
+                placeholder="Avanza Veloz 1.5" class="input"></div>
+          </div>
+          <div class="form-grid--3">
+            <div class="field"><label class="label">Tahun *</label><input type="number" id="av_year" value="2024"
+                required class="input"></div>
+            <div class="field"><label class="label">Kategori *</label>
+              <select id="av_category" class="input">
+                <option value="Mobil MPV/SUV">Mobil MPV/SUV</option>
+                <option value="Truk/Bus">Truk/Bus</option>
+                <option value="Sepeda Motor">Sepeda Motor</option>
+                <option value="Kendaraan Niaga/Pick-up">Kendaraan Niaga/Pick-up</option>
+                <option value="Sedan/Hatchback">Sedan/Hatchback</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Bahan Bakar *</label>
+              <select id="av_fuel" class="input">
+                <option value="Bensin (Pertalite/Pertamax)">Bensin (Pertalite/Pertamax)</option>
+                <option value="Diesel/Solar">Diesel/Solar</option>
+                <option value="Hibrida (Hybrid)">Hibrida (Hybrid)</option>
+                <option value="Listrik (EV)">Listrik (EV)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Odometer Awal (KM) *</label><input type="number" id="av_odometer"
+                value="0" required class="input"></div>
+            <div class="field"><label class="label">Lokasi Pool / Garasi *</label><input id="av_pool"
+                value="Pool Utama Jakarta Pusat" required class="input"></div>
+          </div>
+          <div class="form-section">
+            <h4 class="form-section__title"><i class="fa-solid fa-shield-halved"></i> 2 Skema Legalitas Samsat</h4>
+            <div class="form-grid">
+              <div class="field"><label class="label">1. Jatuh Tempo Pajak Tahunan (PKB) *</label><input type="date"
+                  id="av_tax_date" required class="input" style="background:#fff"></div>
+              <div class="field"><label class="label">2. Jatuh Tempo STNK 5 Tahunan *</label><input type="date"
+                  id="av_stnk_date" required class="input" style="background:#fff"></div>
+            </div>
+          </div>
+          <div class="field"><label class="label">URL Foto Kendaraan (opsional)</label><input id="av_image"
+              placeholder="https://..." class="input"></div>
+          <div class="form-section" style="background:var(--amber-50);border-color:var(--amber-200)">
+            <h4 class="form-section__title" style="color:var(--amber-800)"><i class="fa-solid fa-calculator"></i> Estimasi Biaya Servis</h4>
+            <div class="form-grid">
+              <div class="field"><label class="label">Jenis Servis yang Diperkirakan</label><input id="av_service_type"
+                  placeholder="Servis Berkala (Ganti Oli & Filter)" class="input"></div>
+              <div class="field"><label class="label">Estimasi Biaya (Rp)</label><input type="number" id="av_service_cost"
+                  value="0" min="0" class="input"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" onclick="closeModal('addVehicleModal')" class="btn btn--outline">Batal</button>
+          <button type="submit" class="btn btn--primary">Simpan Unit Baru</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Vehicle -->
+  <div class="modal-overlay" id="editVehicleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-pen" style="color:var(--indigo-600)"></i> Edit Data Kendaraan</h3>
+        <button onclick="closeModal('editVehicleModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitEditVehicle(event)">
+        <div class="modal-body">
+          <input type="hidden" id="ev_id">
+          <div class="form-grid--3">
+            <div class="field"><label class="label">Plat Nomor *</label><input id="ev_plate" required
+                placeholder="B 1234 ABC" style="text-transform:uppercase;font-family:monospace;font-weight:700"
+                class="input"></div>
+            <div class="field"><label class="label">Merk *</label><input id="ev_brand" required placeholder="Toyota"
+                class="input"></div>
+            <div class="field"><label class="label">Model *</label><input id="ev_model" required
+                placeholder="Avanza Veloz 1.5" class="input"></div>
+          </div>
+          <div class="form-grid--3">
+            <div class="field"><label class="label">Tahun *</label><input type="number" id="ev_year" required
+                class="input"></div>
+            <div class="field"><label class="label">Kategori *</label>
+              <select id="ev_category" class="input">
+                <option value="Mobil MPV/SUV">Mobil MPV/SUV</option>
+                <option value="Truk/Bus">Truk/Bus</option>
+                <option value="Sepeda Motor">Sepeda Motor</option>
+                <option value="Kendaraan Niaga/Pick-up">Kendaraan Niaga/Pick-up</option>
+                <option value="Sedan/Hatchback">Sedan/Hatchback</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Bahan Bakar *</label>
+              <select id="ev_fuel" class="input">
+                <option value="Bensin (Pertalite/Pertamax)">Bensin (Pertalite/Pertamax)</option>
+                <option value="Diesel/Solar">Diesel/Solar</option>
+                <option value="Hibrida (Hybrid)">Hibrida (Hybrid)</option>
+                <option value="Listrik (EV)">Listrik (EV)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Odometer (KM) *</label><input type="number" id="ev_odometer"
+                required class="input"></div>
+            <div class="field"><label class="label">Lokasi Pool / Garasi *</label><input id="ev_pool" required
+                class="input"></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Status Operasional *</label>
+              <select id="ev_status" class="input">
+                <option value="Tersedia">Tersedia</option>
+                <option value="Sedang Digunakan">Sedang Digunakan</option>
+                <option value="Dalam Perawatan">Dalam Perawatan</option>
+                <option value="Non-Aktif">Non-Aktif</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Biaya Pajak Tahunan (Rp)</label><input type="number"
+                id="ev_tax_cost" value="0" class="input"></div>
+          </div>
+          <div class="form-section">
+            <h4 class="form-section__title"><i class="fa-solid fa-shield-halved"></i> 2 Skema Legalitas Samsat</h4>
+            <div class="form-grid">
+              <div class="field"><label class="label">1. Jatuh Tempo Pajak Tahunan (PKB) *</label><input type="date"
+                  id="ev_tax_date" required class="input" style="background:#fff"></div>
+              <div class="field"><label class="label">2. Jatuh Tempo STNK 5 Tahunan *</label><input type="date"
+                  id="ev_stnk_date" required class="input" style="background:#fff"></div>
+            </div>
+          </div>
+          <div class="field"><label class="label">URL Foto Kendaraan (opsional)</label><input id="ev_image"
+              placeholder="https://..." class="input"></div>
+          <div class="field"><label class="label">Catatan</label><textarea id="ev_notes" rows="2"
+              placeholder="Catatan unit..." class="input"></textarea></div>
+          <div class="form-section" style="background:var(--amber-50);border-color:var(--amber-200)">
+            <h4 class="form-section__title" style="color:var(--amber-800)"><i class="fa-solid fa-calculator"></i> Estimasi Biaya Servis</h4>
+            <div class="form-grid">
+              <div class="field"><label class="label">Jenis Servis yang Diperkirakan</label><input id="ev_service_type"
+                  placeholder="Servis Berkala (Ganti Oli & Filter)" class="input"></div>
+              <div class="field"><label class="label">Estimasi Biaya (Rp)</label><input type="number" id="ev_service_cost"
+                  value="0" min="0" class="input"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" onclick="closeModal('editVehicleModal')" class="btn btn--outline">Batal</button>
+          <button type="submit" class="btn btn--indigo">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Service -->
+  <div class="modal-overlay" id="addServiceModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-wrench" style="color:var(--amber-600)"></i> Catat Log Servis
+          Bengkel</h3>
+        <button onclick="closeModal('addServiceModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitAddService(event)">
+        <div class="modal-body">
+          <div class="field"><label class="label">Pilih Kendaraan *</label><select id="as_vehicle" required
+              class="input"></select></div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Tanggal Servis *</label><input type="date" id="as_date" required
+                class="input"></div>
+            <div class="field"><label class="label">Odometer Servis (KM) *</label><input type="number" id="as_odometer"
+                required class="input"></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Nama Bengkel *</label><input id="as_workshop" required
+                placeholder="Auto2000 Jakarta" class="input"></div>
+            <div class="field"><label class="label">Nama Mekanik</label><input id="as_mechanic"
+                placeholder="Nama Mekanik" class="input"></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Jenis Servis *</label>
+              <select id="as_type" required class="input">
+                <option value="Servis Berkala">Servis Berkala</option>
+                <option value="Ganti Oli">Ganti Oli</option>
+                <option value="Perbaikan Rem">Perbaikan Rem</option>
+                <option value="Tune Up">Tune Up</option>
+                <option value="Perbaikan Mesin">Perbaikan Mesin</option>
+                <option value="Perbaikan Body">Perbaikan Body</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Biaya (Rp) *</label><input type="number" id="as_cost" required
+                placeholder="1500000" class="input"></div>
+          </div>
+          <div class="field"><label class="label">Rincian Perbaikan</label><input id="as_desc"
+              placeholder="Ganti oli mesin, filter oli..." class="input"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" onclick="closeModal('addServiceModal')" class="btn btn--outline">Batal</button>
+          <button type="submit" class="btn btn--amber">Simpan Catatan Servis</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Tax Payment -->
+  <div class="modal-overlay" id="addTaxModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-receipt" style="color:var(--teal-600)"></i> Catat Pembayaran Pajak
+          Samsat</h3>
+        <button onclick="closeModal('addTaxModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitAddTax(event)">
+        <div class="modal-body">
+          <div class="field"><label class="label">Pilih Kendaraan *</label><select id="at_vehicle" required
+              class="input"></select></div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Tanggal Bayar *</label><input type="date" id="at_date" required
+                class="input"></div>
+            <div class="field"><label class="label">Skema Pembayaran *</label>
+              <select id="at_type" required class="input">
+                <option value="Pajak Tahunan">Pajak Tahunan (PKB)</option>
+                <option value="STNK 5 Tahunan">STNK 5 Tahunan (Ganti Plat)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Nominal Bayar (Rp) *</label><input type="number" id="at_amount"
+                required placeholder="3500000" class="input"></div>
+            <div class="field"><label class="label">Masa Berlaku Baru *</label><input type="date" id="at_new_due"
+                required class="input"></div>
+          </div>
+          <div class="field"><label class="label">No. Resi / SKUM Samsat *</label><input id="at_receipt" required
+              placeholder="SKUM-2026-XXXXX" style="font-family:monospace" class="input"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" onclick="closeModal('addTaxModal')" class="btn btn--outline">Batal</button>
+          <button type="submit" class="btn btn--teal">Simpan Pembayaran Pajak</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Tax Payment -->
+  <div class="modal-overlay" id="editTaxModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-pen-to-square" style="color:var(--teal-600)"></i> Edit Riwayat
+          Pembayaran Pajak</h3>
+        <button onclick="closeModal('editTaxModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitEditTax(event)">
+        <div class="modal-body">
+          <input type="hidden" id="et_id">
+          <div class="field"><label class="label">Pilih Kendaraan *</label><select id="et_vehicle" required
+              class="input"></select></div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Tanggal Bayar *</label><input type="date" id="et_date" required
+                class="input"></div>
+            <div class="field"><label class="label">Skema Pembayaran *</label>
+              <select id="et_type" required class="input">
+                <option value="Pajak Tahunan">Pajak Tahunan (PKB)</option>
+                <option value="STNK 5 Tahunan">STNK 5 Tahunan (Ganti Plat)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Nominal Bayar (Rp) *</label><input type="number" id="et_amount"
+                required class="input"></div>
+            <div class="field"><label class="label">Masa Berlaku Baru *</label><input type="date" id="et_new_due"
+                required class="input"></div>
+          </div>
+          <div class="field"><label class="label">No. Resi / SKUM Samsat *</label><input id="et_receipt" required
+              style="font-family:monospace" class="input"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" onclick="closeModal('editTaxModal')" class="btn btn--outline">Batal</button>
+          <button type="submit" class="btn btn--teal">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Delete Tax Confirmation -->
+  <div class="modal-overlay" id="deleteTaxModal">
+    <div class="modal" style="max-width:440px">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--rose-600)"></i> Hapus
+          Riwayat Pembayaran Pajak</h3>
+        <button onclick="closeModal('deleteTaxModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="dt_id">
+        <p class="text-sm" style="text-align:center;padding:8px 0">Apakah Anda yakin ingin menghapus riwayat pembayaran
+          pajak ini?</p>
+        <div id="dt_info"
+          style="background:var(--rose-50);border:1px solid var(--rose-200);border-radius:8px;padding:12px;margin-top:8px">
+        </div>
+        <p class="text-xs text-muted" style="text-align:center;margin-top:12px"><i class="fa-solid fa-circle-info"></i>
+          Tindakan ini tidak dapat dibatalkan.</p>
+      </div>
+      <div class="modal-footer" style="justify-content:center">
+        <button type="button" onclick="closeModal('deleteTaxModal')" class="btn btn--outline">Batal</button>
+        <button type="button" onclick="deleteTax()" class="btn btn--rose">Ya, Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Start Trip -->
+  <div class="modal-overlay" id="startTripModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-route" style="color:var(--green-600)"></i> Mulai Tugas Perjalanan
+          Baru</h3>
+        <button onclick="closeModal('startTripModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitStartTrip(event)">
+        <div class="modal-body">
+          <div class="field"><label class="label">Pilih Kendaraan (Tersedia) *</label><select id="st_vehicle" required
+              class="input"></select></div>
+          <div class="form-grid">
+            <div class="field"><label class="label">Nama Driver / Pengemudi *</label><input id="st_driver" required
+                placeholder="Nama Driver" class="input"></div>
+            <div class="field"><label class="label">KM Awal (Odometer) *</label><input type="number" id="st_odometer"
+                required class="input"></div>
+          </div>
+          <div class="field"><label class="label">Tujuan Perjalanan *</label><input id="st_destination" required
+              placeholder="Kawasan Industri - Kota" class="input"></div>
+          <div class="field"><label class="label">Keperluan / Keterangan *</label><input id="st_purpose" required
+              placeholder="Pengiriman barang" class="input"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" onclick="closeModal('startTripModal')" class="btn btn--outline">Batal</button>
+          <button type="submit" class="btn btn--green">Mulai Perjalanan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Complete Trip -->
+  <div class="modal-overlay" id="completeTripModal">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-flag-checkered" style="color:var(--green-600)"></i> Selesaikan
+          Perjalanan</h3>
+        <button onclick="closeModal('completeTripModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitCompleteTrip(event)">
+        <div class="modal-body">
+          <input type="hidden" id="ct_trip_id">
+          <input type="hidden" id="ct_vehicle_id">
+          <div class="form-grid">
+            <div class="field"><label class="label">KM Akhir (Odometer) *</label><input type="number" id="ct_end_odo"
+                required class="input"></div>
+            <div class="field"><label class="label">Biaya BBM (Rp)</label><input type="number" id="ct_fuel_cost"
+                value="0" class="input"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" onclick="closeModal('completeTripModal')" class="btn btn--outline">Batal</button>
+          <button type="submit" class="btn btn--green">Selesaikan &amp; Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Vehicle Detail -->
+  <div class="modal-overlay" id="vehicleDetailModal">
+    <div class="modal modal--lg">
+      <div id="vd-content"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- JAVASCRIPT ENGINE -->
+  <!-- ============================================================ -->
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,192 @@
+<!-- ============================================================ -->
+<!-- TAB 4: STATUS PAJAK & STNK -->
+<!-- ============================================================ -->
+<section id="sec-tax" class="section">
+  <div class="stack--6">
+    <div class="card card--tax-overview slide-up">
+      <div class="flex-between flex-wrap mb-16" style="gap:16px">
+        <div>
+          <h2 class="text-bold" style="font-size:20px"><i class="fa-solid fa-shield-halved"
+              style="color:var(--teal-600)"></i> Manajemen Dua Skema Pajak &amp; Legalisasi STNK</h2>
+          <p class="text-xs text-secondary" style="margin-top:2px">Pemantauan terpisah antara <strong
+              style="color:var(--teal-700)">Skema 1: Pajak Tahunan (PKB)</strong> dan <strong
+              style="color:var(--teal-800)">Skema 2: STNK 5 Tahunan (Perpanjangan Plat)</strong>.</p>
+        </div>
+        <button onclick="openModal('addTaxModal')" class="btn btn--primary"><i class="fa-solid fa-plus"></i>Catat
+          Pembayaran Samsat</button>
+      </div>
+
+      <div class="grid grid--2">
+        <div class="scheme-box scheme-box--dark">
+          <div class="scheme-box__head">
+            <span class="scheme-box__title" style="color:var(--teal-900)"><i class="fa-solid fa-shield-halved"
+                style="color:var(--teal-600)"></i> SKEMA 1: PAJAK TAHUNAN (PKB)</span>
+            <span class="scheme-box__pill" style="background:var(--teal-100);color:var(--teal-800)">Rutin 1 Tahun</span>
+          </div>
+          <p class="scheme-box__desc">Pengesahan STNK tahunan &amp; pembayaran Pajak Kendaraan Bermotor (PKB).</p>
+          <div class="scheme-box__stats">
+            <div class="scheme-stat"><span class="scheme-stat__label"
+                style="color:var(--rose-700)">Kadaluwarsa</span><span class="scheme-stat__value"
+                style="color:var(--rose-900)" id="tax-s1-expired">0</span></div>
+            <div class="scheme-stat"><span class="scheme-stat__label" style="color:var(--amber-700)">&lt; 30
+                Hari</span><span class="scheme-stat__value" style="color:var(--amber-900)" id="tax-s1-warning">0</span>
+            </div>
+            <div class="scheme-stat"><span class="scheme-stat__label" style="color:var(--green-800)">Aman</span><span
+                class="scheme-stat__value" style="color:var(--green-900)" id="tax-s1-safe">0</span></div>
+          </div>
+        </div>
+
+        <div class="scheme-box scheme-box--dark">
+          <div class="scheme-box__head">
+            <span class="scheme-box__title" style="color:var(--teal-900)"><i class="fa-solid fa-id-card"
+                style="color:var(--teal-700)"></i> SKEMA 2: STNK 5 TAHUNAN (GANTI PLAT)</span>
+            <span class="scheme-box__pill" style="background:var(--teal-200);color:var(--teal-900)">Cetak Plat 5
+              Tahun</span>
+          </div>
+          <p class="scheme-box__desc ">Perpanjangan fisik STNK baru, ganti Plat Nomor, dan Cek Fisik Samsat.</p>
+          <div class="scheme-box__stats">
+            <div class="scheme-stat"><span class="scheme-stat__label"
+                style="color:var(--rose-700)">Kadaluwarsa</span><span class="scheme-stat__value"
+                style="color:var(--rose-900)" id="tax-s2-expired">0</span></div>
+            <div class="scheme-stat"><span class="scheme-stat__label" style="color:var(--amber-700)">&lt; 30
+                Hari</span><span class="scheme-stat__value" style="color:var(--amber-900)" id="tax-s2-warning">0</span>
+            </div>
+            <div class="scheme-stat"><span class="scheme-stat__label" style="color:var(--green-800)">Aman</span><span
+                class="scheme-stat__value" style="color:var(--green-900)" id="tax-s2-safe">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tax-summary-card " id="tax-summary-section">
+        <div class="tax-summary-card__header">
+          <div>
+            <div class="flex-gap" style="align-items:center;margin-bottom:4px">
+              <h3 class="tax-summary-card__title"><i class="fa-solid fa-calendar-check"
+                  style="color:var(--teal-600)"></i> Estimasi Biaya Pajak 30 Hari ke Depan</h3>
+              <span class="badge badge--teal" style="font-size:10px"><i class="fa-solid fa-chart-line"></i>
+                Proyeksi</span>
+            </div>
+            <p class="tax-summary-card__subtitle">Perkiraan kewajiban pajak yang akan jatuh tempo dalam 30 hari ke depan
+              (bukan historis)</p>
+          </div>
+          <div class="tax-summary-card__amount" id="tax-30day-cost">Rp 0</div>
+        </div>
+        <div class="tax-summary-card__body">
+          <div class="tax-summary-card__stats">
+            <div class="tax-summary-stat">
+              <div class="tax-summary-stat__icon" style="background:var(--rose-100);color:var(--rose-700)"><i
+                  class="fa-solid fa-exclamation-triangle"></i></div>
+              <div class="tax-summary-stat__content">
+                <div class="tax-summary-stat__value" id="tax-expired-count">0</div>
+                <div class="tax-summary-stat__label">Kendaraan Kadaluwarsa</div>
+              </div>
+            </div>
+            <div class="tax-summary-stat">
+              <div class="tax-summary-stat__icon" style="background:var(--amber-100);color:var(--amber-700)"><i
+                  class="fa-solid fa-clock"></i></div>
+              <div class="tax-summary-stat__content">
+                <div class="tax-summary-stat__value" id="tax-warning-count">0</div>
+                <div class="tax-summary-stat__label">&lt; 30 Hari</div>
+              </div>
+            </div>
+            <div class="tax-summary-stat">
+              <div class="tax-summary-stat__icon" style="background:var(--green-100);color:var(--green-700)"><i
+                  class="fa-solid fa-check-circle"></i></div>
+              <div class="tax-summary-stat__content">
+                <div class="tax-summary-stat__value" id="tax-fleet-readiness">0%</div>
+                <div class="tax-summary-stat__label">Kesiapan Kendaraan</div>
+              </div>
+            </div>
+          </div>
+          <div class="tax-summary-card__list" id="tax-upcoming-list"></div>
+          <div class="tax-summary-card__recommendation" id="tax-recommendation"></div>
+        </div>
+      </div>
+
+      <div class="tax-calendar-card">
+        <div class="tax-calendar-card__header">
+          <div>
+            <div class="flex-gap" style="align-items:center;margin-bottom:4px">
+              <h3 class="tax-calendar-card__title"><i class="fa-solid fa-calendar-days"
+                  style="color:var(--teal-700)"></i> Kalender Pajak Tahunan</h3>
+              <span class="badge badge--teal-dark" style="font-size:10px"><i class="fa-solid fa-calendar-alt"></i> 12
+                Bulan</span>
+            </div>
+            <p class="tax-calendar-card__subtitle">Jadwal jatuh tempo pajak per bulan untuk perencanaan anggaran</p>
+          </div>
+          <div class="tax-calendar-card__year" id="tax-calendar-year">2026</div>
+        </div>
+        <div class="tax-calendar-card__body">
+          <div class="tax-calendar-grid" id="tax-calendar-grid"></div>
+          <div class="tax-calendar-legend">
+            <div class="tax-calendar-legend__item">
+              <span class="tax-calendar-legend__dot" style="background:var(--rose-500)"></span>
+              <span class="text-xs">Kadaluwarsa</span>
+            </div>
+            <div class="tax-calendar-legend__item">
+              <span class="tax-calendar-legend__dot" style="background:var(--amber-500)"></span>
+              <span class="text-xs">&lt; 30 Hari</span>
+            </div>
+            <div class="tax-calendar-legend__item">
+              <span class="tax-calendar-legend__dot" style="background:var(--green-500)"></span>
+              <span class="text-xs">Aman</span>
+            </div>
+            <div class="tax-calendar-legend__item">
+              <span class="tax-calendar-legend__dot" style="background:var(--teal-500)"></span>
+              <span class="text-xs">Bulan Ini</span>
+            </div>
+          </div>
+          <div class="tax-calendar-summary" id="tax-calendar-summary"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card--tax-list">
+      <div class="flex-between flex-wrap mb-16" style="gap:12px">
+        <div>
+          <h3 class="text-bold" style="font-size:15px">Daftar Status Pajak per Kendaraan</h3>
+          <p class="text-xs text-secondary">Menampilkan status untuk kedua skema pada setiap unit armada</p>
+        </div>
+        <div class="flex-gap">
+          <div class="search"><i class="fa-solid fa-search"></i><input id="tax-search" oninput="renderTax()" type="text"
+              placeholder="Cari Plat Nomor / Unit..." class="input" style="min-width:150px"></div>
+          <select id="tax-scheme-filter" onchange="renderTax()" class="select">
+            <option value="">Semua Skema Pajak</option>
+            <option value="expired">Kadaluwarsa</option>
+            <option value="warning">&lt; 30 Hari</option>
+            <option value="safe">Aman</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid--3" id="tax-cards-grid"></div>
+    </div>
+
+    <div class="card card--tax-history">
+      <div class="flex-between flex-wrap mb-16" style="gap:12px">
+        <h3 class="text-bold" style="font-size:15px">Riwayat Tanda Bukti Pelunasan Pajak (SKUM Samsat)</h3>
+        <div class="flex-gap">
+          <button onclick="exportTaxExcel()" class="btn btn--outline btn--xs" title="Export ke Excel"><i
+              class="fa-solid fa-file-excel"></i> Excel</button>
+          <button onclick="exportTaxPDF()" class="btn btn--outline btn--xs" title="Export ke PDF"><i
+              class="fa-solid fa-file-pdf"></i> PDF</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tanggal Bayar</th>
+              <th>Plat &amp; Unit</th>
+              <th>Skema Pembayaran</th>
+              <th>No. Resi / SKUM</th>
+              <th>Masa Berlaku Baru</th>
+              <th class="text-right">Nominal (Rp)</th>
+              <th class="text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tax-history-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

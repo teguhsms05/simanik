@@ -1,0 +1,55 @@
+<!-- ============================================================ -->
+<!-- TAB 5: RIWAYAT & LIVE TRACKING -->
+<!-- ============================================================ -->
+<section id="sec-tracking" class="section">
+  <div class="stack--6">
+    <div class="card card--tracking-overview slide-up">
+      <div class="flex-between flex-wrap mb-16" style="gap:16px">
+        <div>
+          <h2 class="text-bold" style="font-size:20px"><i class="fa-solid fa-route" style="color:var(--green-600)"></i> Pemantauan &amp; Riwayat Penggunaan Real-time</h2>
+          <p class="text-xs text-secondary" style="margin-top:2px">Pencatatan tugas perjalanan kendaraan, pengemudi, tujuan, kilometer, dan efisiensi konsumsi bahan bakar</p>
+        </div>
+        <button onclick="openModal('startTripModal')" class="btn btn--green"><i class="fa-solid fa-plus"></i> + Mulai Perjalanan Baru</button>
+      </div>
+      <div class="grid grid--metrics">
+        <div class="metric metric--green">
+          <span class="metric__label metric__label--green"><span class="dot-live"></span> Sedang Bertugas Real-time</span>
+          <div class="metric__value" style="color:var(--green-900)" id="track-active">0 Kendaraan</div>
+          <p class="metric__sub" style="color:var(--green-700)">Aktif dalam perjalanan jalan raya</p>
+        </div>
+        <div class="metric"><span class="metric__label">Total Jarak Ditempuh</span><div class="metric__value" id="track-distance">0 km</div><p class="metric__sub" id="track-distance-sub">Dari 0 perjalanan selesai</p></div>
+        <div class="metric"><span class="metric__label">Total Pengeluaran BBM</span><div class="metric__value" style="color:var(--blue-900)" id="track-fuel-cost">Rp 0</div><p class="metric__sub">Akumulasi struk BBM terverifikasi</p></div>
+      </div>
+    </div>
+
+    <div id="tracking-live-section" class="live-card" style="display:none;">
+      <div class="live-card__head mb-16">
+        <div class="flex-gap"><span class="dot-ping"></span><h3 class="live-card__title">Live Monitoring Tugas Aktif</h3></div>
+        <span class="text-xs" style="color:var(--slate-400);font-family:monospace">Telemetri GPS Aktif</span>
+      </div>
+      <div class="live-card__grid" id="tracking-live-content"></div>
+    </div>
+
+    <div class="card card--tracking-history">
+      <div class="flex-between flex-wrap mb-16" style="gap:12px">
+        <h3 class="text-bold" style="font-size:15px">Riwayat Penggunaan &amp; Perjalanan Kendaraan</h3>
+        <div class="flex-gap">
+          <button onclick="exportTrackingExcel()" class="btn btn--outline btn--xs" title="Export ke Excel"><i class="fa-solid fa-file-excel"></i> Excel</button>
+          <button onclick="exportTrackingPDF()" class="btn btn--outline btn--xs" title="Export ke PDF"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+          <div class="search"><i class="fa-solid fa-search"></i><input id="track-search" oninput="renderTracking()" type="text" placeholder="Cari Plat, Driver, Tujuan..." class="input" style="min-width:150px"></div>
+          <select id="track-status-filter" onchange="renderTracking()" class="select">
+            <option value="">Semua Status</option>
+            <option value="Berjalan">Sedang Berjalan</option>
+            <option value="Selesai">Selesai</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Waktu Mulai</th><th>Plat &amp; Kendaraan</th><th>Pengemudi</th><th>Tujuan &amp; Keperluan</th><th>KM Awal &rarr; Akhir</th><th>Jarak</th><th>Biaya BBM</th><th>Status</th><th class="text-right">Aksi</th></tr></thead>
+          <tbody id="track-history-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

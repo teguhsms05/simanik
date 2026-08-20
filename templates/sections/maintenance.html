@@ -1,0 +1,133 @@
+<!-- ============================================================ -->
+<!-- TAB 3: STATUS PERAWATAN -->
+<!-- ============================================================ -->
+<section id="sec-maintenance" class="section">
+  <div class="stack--6">
+    <div class="card card--maintenance-overview slide-up">
+      <div class="flex-between flex-wrap mb-16" style="gap:16px">
+        <div>
+          <h2 class="text-bold" style="font-size:20px"><i class="fa-solid fa-wrench" style="color:var(--amber-600)"></i>
+            Manajemen Perawatan &amp; Servis Berkala</h2>
+          <p class="text-xs text-secondary" style="margin-top:2px">Pantau jadwal ganti oli, tune-up, perbaikan mekanis,
+            dan akumulasi biaya pemeliharaan unit</p>
+        </div>
+        <button onclick="openModal('addServiceModal')" class="btn btn--amber"><i class="fa-solid fa-plus"></i> Catat
+          Log Servis Baru</button>
+      </div>
+      <div class="grid grid--metrics">
+        <div class="metric metric--click" onclick="filterNeedService()"><span class="metric__label">Perlu Tindakan
+            Servis</span>
+          <div class="metric__value" style="color:var(--amber-700)" id="maint-need">0 Unit</div>
+          <p class="metric__sub">Odometer mendekati / lewati batas</p>
+        </div>
+        <div class="metric metric--click" onclick="toggleBudgetDetail()"><span class="metric__label">Total Anggaran
+            Biaya Servis</span>
+          <div class="metric__value" style="color:var(--rose-600)" id="maint-budget">Rp 0</div>
+          <p class="metric__sub" id="maint-budget-sub">Estimasi untuk unit perlu servis</p>
+        </div>
+        <div class="metric"><span class="metric__label">Rata-Rata Biaya per Servis</span>
+          <div class="metric__value" style="color:var(--rose-600)" id="maint-avg-cost">Rp 0</div>
+          <p class="metric__sub" id="maint-count-sub">0 transaksi servis tercatat</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card--budget-detail slide-up" id="budget-detail-card" style="display:none">
+      <div class="flex-between mb-16" style="gap:12px">
+        <div>
+          <h3 class="text-bold" style="font-size:15px"><i class="fa-solid fa-calculator"
+              style="color:var(--primary-600)"></i> Detail Perhitungan Anggaran Biaya Servis</h3>
+          <p class="text-xs text-secondary" style="margin-top:2px">Rincian estimasi biaya berdasarkan unit yang perlu
+            servis</p>
+        </div>
+        <button onclick="toggleBudgetDetail()" class="btn btn--ghost btn--xs"><i style="color:var(--primary-600)"
+            class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="grid grid--3 mb-16">
+        <div class="metric">
+          <span class="metric__label"><i class="fa-solid fa-car-side"></i> Unit Perlu Servis</span>
+          <div class="metric__value" id="detail-need-count" style="color:var(--amber-600)">0</div>
+          <p class="metric__sub">Kendaraan dengan status "Segera Servis"</p>
+        </div>
+        <div class="metric">
+          <span class="metric__label"><i class="fa-solid fa-receipt"></i> Rata-Rata Biaya/Servis</span>
+          <div class="metric__value" id="detail-avg-cost" style="color:var(--rose-600)">Rp 0</div>
+          <p class="metric__sub" id="detail-transactions">0 transaksi tercatat</p>
+        </div>
+        <div class="metric">
+          <span class="metric__label"><i class="fa-solid fa-coins"></i> Total Anggaran</span>
+          <div class="metric__value" style="color:var(--rose-600)" id="detail-total-budget">Rp 0</div>
+          <p class="metric__sub" style="color:var(--text-secondary)">Unit × Rata-rata biaya</p>
+        </div>
+      </div>
+      <div class="card" style="background:var(--slate-50);padding:16px">
+        <h4 class="text-bold text-sm mb-16"><i class="fa-solid fa-list"></i> Rincian Per Unit</h4>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Plat Nomor</th>
+                <th>Kendaraan</th>
+                <th>Status</th>
+                <th>Jenis Servis & Progress</th>
+                <th class="text-right">Estimasi Biaya</th>
+              </tr>
+            </thead>
+            <tbody id="budget-detail-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card--maintenance-status">
+      <div class="flex-between flex-wrap mb-16" style="gap:12px">
+        <h3 class="text-bold" style="font-size:15px">Status Kelayakan Odometer &amp; Servis Setiap Unit</h3>
+        <div class="flex-gap">
+          <div class="search"><i class="fa-solid fa-search"></i><input id="maint-search" oninput="renderMaintenance()"
+              type="text" placeholder="Cari Plat / Unit..." class="input" style="min-width:150px"></div>
+          <select id="maint-status-filter" onchange="renderMaintenance()" class="select">
+            <option value="">Semua Status</option>
+            <option value="Kondisi Prima">Kondisi Prima</option>
+            <option value="Segera Servis">Segera Servis</option>
+            <option value="Sedang di Bengkel">Sedang di Bengkel</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid--3" id="maint-cards-grid"></div>
+    </div>
+
+    <div class="card card--maintenance-history">
+      <div class="flex-between flex-wrap mb-16" style="gap:12px">
+        <div>
+          <h3 class="text-bold" style="font-size:15px">Riwayat Catatan Perawatan &amp; Faktur Bengkel</h3>
+          <p class="text-xs text-secondary" style="margin-top:2px">Total Akumulasi Biaya: <strong id="maint-total-cost"
+              style="color:var(--green-700)">Rp 0</strong></p>
+        </div>
+        <div class="flex-gap">
+          <button onclick="exportMaintenanceExcel()" class="btn btn--outline btn--xs" title="Export ke Excel"><i
+              class="fa-solid fa-file-excel"></i> Excel</button>
+          <button onclick="exportMaintenancePDF()" class="btn btn--outline btn--xs" title="Export ke PDF"><i
+              class="fa-solid fa-file-pdf"></i> PDF</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tanggal Servis</th>
+            <th>Kendaraan</th>
+            <th>Jenis Servis</th>
+            <th>Bengkel &amp; Mekanik</th>
+            <th>Odometer</th>
+            <th>Rincian Perbaikan</th>
+            <th class="text-right">Biaya (Rp)</th>
+          </tr>
+        </thead>
+        <tbody id="maint-history-body"></tbody>
+      </table>
+    </div>
+  </div>
+  </div>
+</section>

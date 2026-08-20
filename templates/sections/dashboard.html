@@ -1,0 +1,194 @@
+<!-- ============================================================ -->
+<!-- TAB 1: DASHBOARD -->
+<!-- ============================================================ -->
+<section id="sec-dashboard" class="section active">
+  <div class="stack--6">
+
+    <!-- Hero Banner -->
+    <div class="hero scale-in">
+      <div class="hero-flex">
+        <div>
+          <span class="hero-badge">Sistem Inventaris Aktif</span>
+          <span class="hero-date">• <span id="hero-date"></span></span>
+          <h2 class="hero-title">Ringkasan Operasional &amp; Inventaris Fleet</h2>
+          <p class="hero-desc">Pantau kelayakan unit, sisa tenggat pajak STNK, jadwal perawatan berkala, dan aktivitas
+            perjalanan secara terpusat.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn--primary" onclick="openModal('addVehicleModal')"><i class="fa-solid fa-plus"></i> Catat
+            Kendaraan Masuk</button>
+          <button class="btn btn--dark" onclick="openModal('startTripModal')"><i class="fa-solid fa-route"
+              style="color:var(--green-400)"></i> Mulai Perjalanan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid--kpi" id="dashboard-stats">
+      <div class="stat-card stat-card--click stat-card-inventory" onclick="switchTab('inventory')">
+        <div class="stat-head">
+          <span class="stat-label">Total Inventaris</span>
+          <div class="stat-icon stat-icon--blue"><i class="fa-solid fa-car-side"></i></div>
+        </div>
+        <div class="stat-value-row"><span class="stat-value" id="ds-total">0</span><span class="stat-unit">Unit</span>
+        </div>
+        <div class="stat-foot">
+          <span class="text-green"><span id="ds-available">0</span> Tersedia</span>
+          <span class="text-blue"><span id="ds-used">0</span> Dipakai</span>
+          <span class="text-amber"><span id="ds-maint">0</span> Servis</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-card--click stat-card-tax" onclick="switchTab('tax')">
+        <div class="stat-head">
+          <span class="stat-label">Peringatan Pajak</span>
+          <div class="stat-icon stat-icon--red"><i class="fa-solid fa-shield-halved"></i></div>
+        </div>
+        <div class="stat-value-row"><span class="stat-value" id="ds-tax-warn">0</span><span class="stat-unit">Perlu
+            Perhatian</span></div>
+        <div class="stat-foot">
+          <span class="text-rose"><span id="ds-tax-expired">0</span> Kadaluwarsa</span>
+          <span class="text-amber"><span id="ds-tax-soon">0</span> &lt;30 Hari</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-card--click stat-card-service" onclick="switchTab('maintenance')">
+        <div class="stat-head">
+          <span class="stat-label">Perlu Servis</span>
+          <div class="stat-icon stat-icon--amber"><i class="fa-solid fa-wrench"></i></div>
+        </div>
+        <div class="stat-value-row"><span class="stat-value" id="ds-need-service">0</span><span class="stat-unit">Unit
+            Perlu Servis</span></div>
+        <div class="stat-foot">
+          <span>Servis berkala &amp; ganti oli</span>
+          <span class="text-amber">Cek Detail &rarr;</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-card--click stat-card-trip" onclick="switchTab('tracking')">
+        <div class="stat-head">
+          <span class="stat-label">Tugas Perjalanan</span>
+          <div class="stat-icon stat-icon--green"><i class="fa-solid fa-route"></i></div>
+        </div>
+        <div class="stat-value-row"><span class="stat-value" id="ds-active-trips">0</span><span class="stat-unit">Sedang
+            Berjalan</span></div>
+        <div class="stat-foot">
+          <span><span id="ds-trip-total">0</span> Total Catatan Tugas</span>
+          <span class="text-green">Live Map &rarr;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert Banner -->
+    <div class="alert" id="alert-banner" style="display:none;">
+      <div class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="grow">
+        <h3 class="alert__title" id="alert-title">Pemberitahuan Mendesak Inventaris</h3>
+        <p class="alert__desc">Beberapa kendaraan membutuhkan tindakan langsung agar siap jalan dan mematuhi aturan lalu
+          lintas.</p>
+        <div class="alert__tags" id="alert-tags"></div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid--main">
+      <!-- Left Column -->
+      <div class="stack--6">
+        <!-- Active Trips -->
+        <div class="card card--dashboard-trips">
+          <div class="flex-between mb-16">
+            <div class="flex-gap">
+              <span class="dot-ping"></span>
+              <h3 class="text-bold" style="font-size:15px">Perjalanan Real-time Saat Ini</h3>
+            </div>
+            <button onclick="switchTab('tracking')" class="link">Lihat Semua Tracker &rarr;</button>
+          </div>
+          <div id="live-trip-content"></div>
+        </div>
+
+        <!-- Inventory Summary Table -->
+        <div class="card card--dashboard-inventory">
+          <div class="flex-between mb-16">
+            <div>
+              <h3 class="text-bold" style="font-size:15px">Ringkasan Unit Inventaris</h3>
+              <p class="text-xs text-secondary">Daftar kendaraan dan status ketersediaan pool</p>
+            </div>
+            <button onclick="switchTab('inventory')" class="link">Kelola Inventaris (<span id="inv-count">0</span>)
+              &rarr;</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Plat &amp; Unit</th>
+                  <th>Kategori</th>
+                  <th>Pool Lokasi</th>
+                  <th>Pajak</th>
+                  <th>Status</th>
+                  <th class="text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="stack--6">
+        <!-- Total Expenses -->
+        <div class="card card--dashboard-expenses">
+          <div class="flex-between mb-16">
+            <h3 class="text-bold" style="font-size:15px"><i class="fa-solid fa-dollar-sign text-green"></i> Total Biaya
+              Ter-record</h3>
+            <span class="badge badge--blue" style="font-size:10px"><i class="fa-solid fa-circle-info"></i>
+              Historis</span>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px">
+            <div class="cost-row"><span>Total Biaya Perawatan &amp; Servis:</span><span class="text-bold"
+                id="cost-maint">Rp 0</span></div>
+            <div class="cost-row">
+              <div>
+                <span>Total Biaya Pembayaran Pajak:</span>
+                <div class="text-xs text-muted" style="margin-top:2px"><i class="fa-solid fa-clock-rotate-left"></i>
+                  Total yang sudah dibayarkan</div>
+              </div>
+              <span class="text-bold" id="cost-tax">Rp 0</span>
+            </div>
+            <div class="cost-row cost-row--total"><span>Total Pengeluaran Fleet:</span><span id="cost-total">Rp 0</span>
+            </div>
+          </div>
+          <div class="grid grid--2 mt-16">
+            <button onclick="switchTab('maintenance')" class="btn btn--outline"
+              style="justify-content:flex-start;text-align:left">
+              <div>
+                <div class="text-xs text-bold">Catat Servis</div>
+                <div class="text-xs text-muted">Input faktur &amp; biaya</div>
+              </div>
+            </button>
+            <button onclick="switchTab('tax')" class="btn btn--outline"
+              style="justify-content:flex-start;text-align:left">
+              <div>
+                <div class="text-xs text-bold">Bayar Pajak</div>
+                <div class="text-xs text-muted">Perpanjang STNK</div>
+              </div>
+            </button>
+          </div>
+          <button onclick="exportFullReportExcel()" class="btn btn--primary mt-16"
+            style="width:100%;justify-content:center"><i class="fa-solid fa-file-excel"></i> Export Laporan Lengkap
+            (Excel)</button>
+        </div>
+
+        <!-- Recent Services -->
+        <div class="card card--dashboard-recent-service">
+          <div class="flex-between mb-16">
+            <h3 class="text-bold" style="font-size:15px">Riwayat Servis Terakhir</h3>
+            <button onclick="switchTab('maintenance')" class="link">Semua Logs</button>
+          </div>
+          <div id="recent-services"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
