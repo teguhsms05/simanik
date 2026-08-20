@@ -224,6 +224,18 @@ def api_vehicles_update(vehicle_id):
     return jsonify({"status": "ok", "id": vehicle_id})
 
 
+@app.route("/api/vehicles/<vehicle_id>", methods=["DELETE"])
+def api_vehicles_delete(vehicle_id):
+    conn = get_db()
+    conn.execute("DELETE FROM maintenance_records WHERE vehicle_id = ?", (vehicle_id,))
+    conn.execute("DELETE FROM tax_records WHERE vehicle_id = ?", (vehicle_id,))
+    conn.execute("DELETE FROM trip_logs WHERE vehicle_id = ?", (vehicle_id,))
+    conn.execute("DELETE FROM vehicles WHERE id = ?", (vehicle_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "ok"})
+
+
 @app.route("/api/maintenance", methods=["GET"])
 def api_maintenance():
     conn = get_db()

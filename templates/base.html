@@ -157,12 +157,13 @@
           <div class="field"><label class="label">URL Foto Kendaraan (opsional)</label><input id="av_image"
               placeholder="https://..." class="input"></div>
           <div class="form-section" style="background:var(--amber-50);border-color:var(--amber-200)">
-            <h4 class="form-section__title" style="color:var(--amber-800)"><i class="fa-solid fa-calculator"></i> Estimasi Biaya Servis</h4>
+            <h4 class="form-section__title" style="color:var(--amber-800)"><i class="fa-solid fa-calculator"></i>
+              Estimasi Biaya Servis</h4>
             <div class="form-grid">
               <div class="field"><label class="label">Jenis Servis yang Diperkirakan</label><input id="av_service_type"
                   placeholder="Servis Berkala (Ganti Oli & Filter)" class="input"></div>
-              <div class="field"><label class="label">Estimasi Biaya (Rp)</label><input type="number" id="av_service_cost"
-                  value="0" min="0" class="input"></div>
+              <div class="field"><label class="label">Estimasi Biaya (Rp)</label><input type="number"
+                  id="av_service_cost" value="0" min="0" class="input"></div>
             </div>
           </div>
         </div>
@@ -246,12 +247,13 @@
           <div class="field"><label class="label">Catatan</label><textarea id="ev_notes" rows="2"
               placeholder="Catatan unit..." class="input"></textarea></div>
           <div class="form-section" style="background:var(--amber-50);border-color:var(--amber-200)">
-            <h4 class="form-section__title" style="color:var(--amber-800)"><i class="fa-solid fa-calculator"></i> Estimasi Biaya Servis</h4>
+            <h4 class="form-section__title" style="color:var(--amber-800)"><i class="fa-solid fa-calculator"></i>
+              Estimasi Biaya Servis</h4>
             <div class="form-grid">
               <div class="field"><label class="label">Jenis Servis yang Diperkirakan</label><input id="ev_service_type"
                   placeholder="Servis Berkala (Ganti Oli & Filter)" class="input"></div>
-              <div class="field"><label class="label">Estimasi Biaya (Rp)</label><input type="number" id="ev_service_cost"
-                  value="0" min="0" class="input"></div>
+              <div class="field"><label class="label">Estimasi Biaya (Rp)</label><input type="number"
+                  id="ev_service_cost" value="0" min="0" class="input"></div>
             </div>
           </div>
         </div>
@@ -405,7 +407,7 @@
         <p class="text-sm" style="text-align:center;padding:8px 0">Apakah Anda yakin ingin menghapus riwayat pembayaran
           pajak ini?</p>
         <div id="dt_info"
-          style="background:var(--rose-50);border:1px solid var(--rose-200);border-radius:8px;padding:12px;margin-top:8px">
+          style="background:var(--card);border:1px solid var(--rose-600);border-radius:8px;padding:12px;margin-top:8px">
         </div>
         <p class="text-xs text-muted" style="text-align:center;margin-top:12px"><i class="fa-solid fa-circle-info"></i>
           Tindakan ini tidak dapat dibatalkan.</p>
@@ -413,6 +415,31 @@
       <div class="modal-footer" style="justify-content:center">
         <button type="button" onclick="closeModal('deleteTaxModal')" class="btn btn--outline">Batal</button>
         <button type="button" onclick="deleteTax()" class="btn btn--rose">Ya, Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Delete Vehicle Confirmation -->
+  <div class="modal-overlay" id="deleteVehicleModal">
+    <div class="modal" style="max-width:440px">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--rose-600)"></i> Hapus
+          Kendaraan</h3>
+        <button onclick="closeModal('deleteVehicleModal')" class="modal-close"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="dv_id">
+        <p class="text-sm" style="text-align:center;padding:8px 0">Apakah Anda yakin ingin menghapus kendaraan ini?</p>
+        <div id="dv_info"
+          style="background:var(--card);border:1px solid var(--rose-600);border-radius:8px;padding:12px;margin-top:8px">
+        </div>
+        <p class="text-xs text-muted" style="text-align:center;margin-top:12px"><i class="fa-solid fa-circle-info"></i>
+          Riwayat servis, pajak &amp; perjalanan kendaraan ini ikut terhapus. Tindakan ini tidak dapat dibatalkan.</p>
+      </div>
+      <div class="modal-footer" style="justify-content:center">
+        <button type="button" onclick="closeModal('deleteVehicleModal')" class="btn btn--outline">Batal</button>
+        <button type="button" onclick="deleteVehicle()" class="btn btn--rose">Ya, Hapus</button>
       </div>
     </div>
   </div>

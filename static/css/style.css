@@ -478,7 +478,7 @@ button {
 }
 
 .btn--rose {
-  background: var(--primary-600);
+  background: var(--rose-600);
   color: #fff;
 }
 

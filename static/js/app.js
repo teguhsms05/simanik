@@ -345,6 +345,7 @@ function renderInventory() {
                     <button onclick="openVehicleDetail('${v.id}')" class="btn btn--outline btn--xs"><i class="fa-solid fa-eye"></i> Detail</button>
                     <button onclick="openEditVehicle('${v.id}')" class="btn btn--edit btn--xs"><i class="fa-solid fa-pen"></i> Edit</button>
                     ${actionBtn}
+                    <button onclick="confirmDeleteVehicle('${v.id}')" class="btn btn--outline btn--xs" style="flex:0 0 auto;color:var(--rose-600);border-color:var(--border)" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
         </div>`;
@@ -361,7 +362,7 @@ function renderInventory() {
             <td style="font-weight:600">${fmt(v.current_odometer)} km</td>
             <td>${taxBadge(daysBetween(v.tax_due_date))}</td>
             <td>${statusBadge(v.status)}</td>
-            <td class="text-right" style="white-space:nowrap"><button onclick="openVehicleDetail('${v.id}')" class="link">Detail</button> &nbsp; <button onclick="openEditVehicle('${v.id}')" class="link" style="color:var(--indigo-600)">Edit</button></td>
+            <td class="text-right" style="white-space:nowrap"><button onclick="openVehicleDetail('${v.id}')" class="link">Detail</button> &nbsp; <button onclick="openEditVehicle('${v.id}')" class="link" style="color:var(--indigo-600)">Edit</button> &nbsp; <button onclick="confirmDeleteVehicle('${v.id}')" class="link" style="color:var(--rose-600)">Hapus</button></td>
         </tr>`).join('')}</tbody>
     </table></div></div>`;
 }
@@ -1142,6 +1143,28 @@ async function deleteTax() {
     closeModal('deleteTaxModal');
     fetchAll();
     showToast('Riwayat pembayaran pajak berhasil dihapus!');
+}
+
+function confirmDeleteVehicle(id) {
+    const v = getVehicle(id);
+    if (!v) return;
+    document.getElementById('dv_id').value = v.id;
+    document.getElementById('dv_info').innerHTML = `
+        <div style="font-size:12px;line-height:1.6">
+            <div><strong>Plat Nomor:</strong> <span style="font-family:monospace;font-weight:700">${v.plate_number}</span></div>
+            <div><strong>Kendaraan:</strong> ${v.brand} ${v.model} (${v.year})</div>
+            <div><strong>Pool:</strong> ${v.pool_location}</div>
+            <div><strong>Status:</strong> ${v.status}</div>
+        </div>`;
+    openModal('deleteVehicleModal');
+}
+
+async function deleteVehicle() {
+    const id = document.getElementById('dv_id').value;
+    await fetch('/api/vehicles/' + id, { method: 'DELETE' });
+    closeModal('deleteVehicleModal');
+    fetchAll();
+    showToast('Kendaraan berhasil dihapus!');
 }
 
 async function submitStartTrip(e) {
