@@ -1,0 +1,20 @@
+**1. Siapkan virtualenv (sekali saja)**
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+**2. Jalankan dengan PM2**
+pm2 start ".venv/bin/gunicorn" --name simanik --interpreter none -- -c gunicorn.conf.py wsgi:application
+- `--interpreter none` penting agar PM2 tidak mencoba menjalankan gunicorn lewat Node.
+- `-- -c ...` meneruskan argumen ke gunicorn.
+**3. Biar otomatis jalan saat server restart**
+pm2 save
+pm2 startup
+**Perintah sehari-hari**
+pm2 status          # lihat proses
+pm2 logs simanik    # lihat log
+pm2 restart simanik # restart (secret key ikut ter-generate ulang)
+pm2 stop simanik
+pm2 delete simanik
+Catatan:
+- `pm2 restart` akan mengulang generate `SECRET_KEY` (sesi lama hilang) — normal sesuai permintaan kamu.
+- Akses app di `http://SERVER_IP:5010`.
